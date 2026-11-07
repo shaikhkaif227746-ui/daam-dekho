@@ -1,0 +1,11 @@
+{
+  "name": "daam-dekho",
+  "version": "1.0.0",
+  "description": "Kisi bhi product ka link daalo, sab stores ka daam, price history aur affiliate links",
+  "type": "module",
+  "engines": { "node": ">=22.5" },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "test": "node --disable-warning=ExperimentalWarning test.js"
+  }
+}
