@@ -76,8 +76,10 @@ export function slugTitle(urlStr) {
 
 const STOP = new Set(['buy', 'online', 'with', 'and', 'the', 'for', 'in', 'at', 'of', 'to', 'by', 'from', 'india', 'price']);
 export const tokens = s => String(s || '').toLowerCase().replace(/(\d)([a-z])/g, '$1 $2').replace(/([a-z])(\d)/g, '$1 $2').split(/[^a-z0-9]+/).filter(t => t && !STOP.has(t) && (t.length > 1 || /\d/.test(t)));
+const COLORS = new Set(['black', 'white', 'blue', 'red', 'green', 'grey', 'gray', 'silver', 'gold', 'pink', 'yellow', 'purple', 'orange', 'brown', 'midnight', 'starlight', 'titanium', 'natural', 'graphite', 'beige', 'cream', 'lavender', 'mint', 'violet', 'teal', 'navy', 'cyan']);
+const queryTokens = q => [...new Set(tokens(q))].filter(t => !COLORS.has(t));
 export function relevance(query, itemTitle) {
-  const q = [...new Set(tokens(query))].slice(0, 10);
+  const q = queryTokens(query).slice(0, 10);
   if (!q.length) return 0;
   const it = new Set(tokens(itemTitle));
   return q.filter(t => it.has(t)).length / q.length;
@@ -87,6 +89,8 @@ export function searchQuery(title) {
   if (t.length <= 100) return t;
   return t.slice(0, 100).replace(/\s+\S*$/, '');
 }
+// Chhoti search: brand + model + storage, rang aur baaki lamba text hata kar.
+export const shortQuery = title => queryTokens(title).slice(0, 6).join(' ');
 export const productKey = title => tokens(title).slice(0, 12).join(' ');
 
 const median = a => { const s = [...a].sort((x, y) => x - y); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
@@ -95,14 +99,14 @@ const median = a => { const s = [...a].sort((x, y) => x - y); const m = s.length
 const VARIANT = new Set(['pro', 'max', 'plus', 'ultra', 'mini', 'lite', 'fe', 'case', 'cover', 'protector', 'tempered', 'glass', 'charger', 'cable', 'strap', 'skin', 'guard', 'stand', 'adapter', 'refurbished', 'renewed', 'used']);
 function sameProduct(query, itemTitle) {
   const q = new Set(tokens(query)), it = new Set(tokens(itemTitle));
-  for (const t of q) if (/^\d+$/.test(t) && !it.has(t)) return false;      // 128, 15, 256 jaise number match hone chahiye
+  for (const t of queryTokens(query).slice(0, 6)) if (/^\d+$/.test(t) && !it.has(t)) return false;      // 128, 15, 256 jaise number match hone chahiye
   for (const t of it) if (VARIANT.has(t) && !q.has(t)) return false;        // query me nahi hai to variant nahi chalega
   return true;
 }
 
 // Search results me se wahi offers rakho jo sach me same product ke hain, har store ka sabse kam daam.
 export function pickOffers(query, items) {
-  let good = items.filter(i => i.price > 0 && i.url && relevance(query, i.title) >= 0.6 && sameProduct(query, i.title));
+  let good = items.filter(i => i.price > 0 && i.url && relevance(query, i.title) >= 0.5 && sameProduct(query, i.title));
   if (good.length >= 3) { const med = median(good.map(i => i.price)); good = good.filter(i => i.price >= med * 0.45); }
   const best = new Map();
   for (const i of good) {

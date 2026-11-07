@@ -7,7 +7,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
 import {
   parseHtml, cleanTitle, slugTitle, searchQuery, productKey, pickOffers,
-  affiliateUrl, isPrivateIp, storeName
+  affiliateUrl, isPrivateIp, storeName, shortQuery
 } from './lib.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -139,10 +139,21 @@ function seedDemoHistory(pid, offers) {
   }
 }
 
+const debugById = new Map();
 async function refreshProduct(p, source) {
   const q = searchQuery(p.title);
   let items = DEMO ? demoOffers(q) : await serpOffers(q);
   let offers = DEMO ? items : pickOffers(q, items);
+  let found = items.length, usedQuery = q;
+  if (!DEMO && offers.length < 2) {
+    const q2 = shortQuery(p.title);
+    if (q2 && q2 !== q) {
+      const items2 = await serpOffers(q2);
+      found += items2.length; usedQuery = q2;
+      offers = pickOffers(q2, [...items, ...items2]);
+    }
+  }
+  debugById.set(p.id, { query: usedQuery, found, kept: offers.length });
   if (source) {
     offers = offers.filter(o => o.store !== source.store);
     offers.push(source);
@@ -199,7 +210,8 @@ async function lookup(input) {
     const r = db.prepare('INSERT INTO products(key,title,created_at) VALUES(?,?,?)').run(key, title, Date.now());
     p = db.prepare('SELECT * FROM products WHERE id=?').get(Number(r.lastInsertRowid));
   }
-  if (Date.now() - p.last_checked > cfg.cacheMs || source) {
+  const cnt = db.prepare('SELECT COUNT(*) AS c FROM offers WHERE product_id=?').get(p.id).c;
+  if (Date.now() - p.last_checked > cfg.cacheMs || source || cnt < 2) {
     let n = 0;
     try { n = await refreshProduct(p, source); }
     catch (e) { console.error('refresh fail:', e.message); if (!db.prepare('SELECT 1 FROM offers WHERE product_id=? LIMIT 1').get(p.id)) throw new UserError('Prices laane mein dikkat aayi. Thodi der baad try karo.', 502); }
@@ -207,7 +219,7 @@ async function lookup(input) {
       throw new UserError('Is product ke liye kisi store par daam nahi mila. Naam thoda chhota ya saaf likh kar try karo.', 404);
     }
   }
-  return { ...view(p.id), warning };
+  return { ...view(p.id), warning, debug: debugById.get(p.id) || null };
 }
 
 // ---------- rate limit ----------

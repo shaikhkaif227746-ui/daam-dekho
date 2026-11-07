@@ -170,7 +170,8 @@ async function run(input) {
     if (!r.ok) throw new Error(d.error || 'Kuch gadbad hui.');
     render(d);
     history.replaceState(null, '', '#p' + d.id);
-    note(d.demo ? 'info' : d.warning ? 'info' : '', d.demo ? 'DEMO mode: server par SERPAPI_KEY nahi hai, isliye prices nakli hain.' : esc(d.warning || ''));
+    const diag = d.debug && d.offers.length < 2 ? `Search se ${d.debug.found} results mile, ${d.debug.kept} sahi match hue. Search: "${esc(d.debug.query)}"` : '';
+    note(d.demo || d.warning || diag ? 'info' : '', d.demo ? 'DEMO mode: server par SERPAPI_KEY nahi hai, isliye prices nakli hain.' : [esc(d.warning || ''), diag].filter(Boolean).join('<br>'));
     loadRecent();
   } catch (e) { $('#result').innerHTML = ''; note('err', esc(e.message)); }
   btn.disabled = false;
