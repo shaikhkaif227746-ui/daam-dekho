@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="hi-Latn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daam Dekho</title>
+<meta name="description" content="Kisi bhi product ka link daalo. Sab stores ka daam, ab tak ka sabse sasta rate aur price history dekho.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F2F5F3; --surface:#FFFFFF; --fg:#13211C; --muted:#5B6B64; --line:#D9E1DC;
+  --accent:#0F6B52; --accent-fg:#FFFFFF; --low:#E3A008; --good-bg:#DDF2E8; --warn-bg:#FCE9DD; --info-bg:#E4ECF7;
+  --c1:#D9730D; --c2:#2563C9; --c3:#B8326F; --c4:#5E7F2A; --c5:#0E8A99; --c6:#8A5A2B;
+  --f-display:"Familjen Grotesk","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root{
+  color-scheme:dark;
+  --bg:#0E1613; --surface:#16221E; --fg:#E6EEEA; --muted:#93A59C; --line:#27372F;
+  --accent:#4FC79B; --accent-fg:#0B1411; --low:#F2B632; --good-bg:#17382B; --warn-bg:#3A2415; --info-bg:#1B2A40;
+  --c1:#F29A4A; --c2:#6EA2FF; --c3:#F076AB; --c4:#9CC656; --c5:#4DC6D6; --c6:#D4A36B}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body);
+  padding:20px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font:700 22px/1 var(--f-display);letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.brand i{font-style:normal;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--accent);color:var(--accent-fg);font:600 17px/1 var(--f-body)}
+h1{font:700 clamp(28px,6.5vw,42px)/1.08 var(--f-display);letter-spacing:-.025em;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:8px 0 0;max-width:54ch}
+form{display:flex;gap:8px;flex-wrap:wrap}
+input[type=text]{flex:1 1 260px;min-width:0;font:500 16px var(--f-body);color:var(--fg);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px}
+input[type=text]::placeholder{color:var(--muted);font-weight:400}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.go{flex:0 0 auto;font:600 16px var(--f-body);background:var(--accent);color:var(--accent-fg);border:0;border-radius:12px;padding:14px 22px;cursor:pointer}
+.go[disabled]{opacity:.6;cursor:progress}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chips span{color:var(--muted);font-size:13px}
+.chip{font:500 13px var(--f-body);color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip:hover{border-color:var(--accent)}
+.msg{border-radius:12px;padding:12px 14px;font-size:14px}
+.msg.err{background:var(--warn-bg)} .msg.info{background:var(--info-bg)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.pname{font:600 20px/1.25 var(--f-display);margin:0;text-wrap:balance;overflow-wrap:anywhere}
+.verdict{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:14px;padding:14px;border-radius:12px;background:var(--good-bg)}
+.verdict.wait{background:var(--warn-bg)}
+.vbig{font:700 30px/1 var(--f-mono);letter-spacing:-.02em}
+.vtxt{min-width:0;flex:1 1 200px;font-size:14px}
+h2{font:600 13px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:22px 0 10px}
+.stat3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+.stat3 div{background:var(--bg);border-radius:10px;padding:10px 12px}
+.stat3 small{display:block;color:var(--muted);font-size:12px}
+.stat3 b{font:500 17px var(--f-mono);font-variant-numeric:tabular-nums}
+.row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.sname{display:flex;align-items:center;gap:8px;font-weight:600;min-width:0;flex-wrap:wrap}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+.sprice{font:500 18px var(--f-mono);font-variant-numeric:tabular-nums}
+.sub{display:block;font:400 12px var(--f-body);color:var(--muted)}
+.pill{font:600 11px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.05em;background:var(--accent);color:var(--accent-fg);padding:3px 6px;border-radius:5px}
+.buy{display:inline-block;text-decoration:none;font:600 14px var(--f-body);color:var(--fg);border:1.5px solid var(--fg);border-radius:10px;padding:9px 14px;white-space:nowrap}
+.row.best .buy{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.chart text{fill:var(--muted);font:400 12px var(--f-mono)}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.note{font-size:13px;color:var(--muted);margin:10px 0 0}
+.foot{font-size:13px;color:var(--muted)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;vertical-align:-2px;margin-right:8px;animation:s .7s linear infinite}
+@keyframes s{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+@media (max-width:480px){.row{grid-template-columns:minmax(0,1fr) auto}.row .sprice{grid-column:1}.row .buy{grid-column:2;grid-row:1 / span 2}}
+
+.alt{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:13px}
+.alt .chip{font-weight:600;border-color:var(--accent);color:var(--accent)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:4px}
+.cand{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;color:var(--fg);font:inherit;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cand:hover{border-color:var(--accent)}
+.cand img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:8px;background:#fff}
+.cand b{font-size:13px;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.cand small{color:var(--muted);font-size:12px}
+.chead{font:600 13px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:6px 0 0}
+.sub{overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="brand"><i>₹</i>Daam Dekho</div></header>
+
+  <section>
+    <h1>Kisi bhi product ka link daalo. Sabse kam daam dekho.</h1>
+    <p class="lead">Amazon, Flipkart, Croma, Reliance Digital aur baaki stores ka abhi ka bhav, ab tak ka sabse sasta rate aur price history. Khareedne ke liye seedha store par jao.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:10px">
+    <form id="f" autocomplete="off">
+      <input type="text" id="q" aria-label="Product ka link ya naam" placeholder="Product ka link paste karo, ya naam likho">
+      <button class="go" id="btn" type="submit">Daam dekho</button>
+    </form>
+    <div class="alt"><span>ya</span><button type="button" class="chip" id="photoBtn">Photo se dhundo</button><input type="file" id="photo" accept="image/*" hidden></div>
+    <div class="chips" id="chips" hidden><span>Pichhle search:</span></div>
+    <div id="msg" aria-live="polite"></div>
+    <div id="cands"></div>
+  </section>
+
+  <section id="result"></section>
+
+  <p class="foot">Affiliate disclosure: is site ke links se khareedne par humein commission mil sakta hai. Aapke liye daam nahi badhta. Daam store par badal sakta hai, khareedne se pehle store par ek baar check kar lo.</p>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
+const fmtD = t => new Date(t).toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+const colorFor = store => { let h = 0; for (const c of store) h = (h * 31 + c.charCodeAt(0)) >>> 0; return `var(--c${h % 6 + 1})`; };
+const niceStep = raw => { const e = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * e; };
+
+function chart(history) {
+  const W = 640, H = 280, L = 66, R = 14, T = 12, B = 28;
+  const stores = Object.keys(history);
+  const pts = stores.flatMap(s => history[s].map(([d, p]) => ({s, t: Date.parse(d), p})));
+  let tmin = Math.min(...pts.map(x => x.t)), tmax = Math.max(...pts.map(x => x.t));
+  if (tmax - tmin < 864e5) { tmin -= 864e5 * 2; tmax += 864e5 * 2; }
+  let lo = Math.min(...pts.map(x => x.p)), hi = Math.max(...pts.map(x => x.p));
+  if (hi === lo) { hi += 100; lo -= 100; }
+  const step = niceStep((hi - lo) / 4);
+  lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+  const x = t => L + (W - L - R) * (t - tmin) / (tmax - tmin), y = v => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
+  let out = '';
+  for (let v = lo; v <= hi + 1; v += step) out += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${inr(v)}</text>`;
+  [0, 1 / 3, 2 / 3, 1].forEach((f, i) => { const t = tmin + (tmax - tmin) * f; out += `<text x="${x(t)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === 3 ? 'end' : 'middle'}">${fmtD(t)}</text>`; });
+  for (const s of stores) {
+    const pl = history[s].map(([d, p]) => [x(Date.parse(d)), y(p)]);
+    if (pl.length > 1) out += `<polyline fill="none" stroke="${colorFor(s)}" stroke-width="2" stroke-linejoin="round" points="${pl.map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' ')}"/>`;
+    const last = pl[pl.length - 1];
+    out += `<circle cx="${last[0]}" cy="${last[1]}" r="4" fill="${colorFor(s)}"/>`;
+  }
+  const best = pts.reduce((a, b) => b.p < a.p ? b : a);
+  const bx = x(best.t), by = y(best.p), end = bx > W * 0.65;
+  out += `<circle cx="${bx}" cy="${by}" r="7" fill="none" stroke="var(--low)" stroke-width="2.5"/>`;
+  out += `<text x="${end ? bx - 12 : bx + 12}" y="${by + (by > H - 60 ? -12 : 20)}" text-anchor="${end ? 'end' : 'start'}" style="fill:var(--fg)">Sabse sasta ${inr(best.p)}</text>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Price history">${out}</svg>`;
+}
+
+function render(d) {
+  const o = d.offers, cheapest = o[0], priciest = o[o.length - 1], atl = d.allTimeLow;
+  const gap = (cheapest.price - atl.price) / atl.price * 100, wait = gap > 12;
+  const verdict = wait
+    ? `Abhi ka sabse kam rate <b>${esc(cheapest.store)}</b> par hai, par ye ab tak ke sabse sasta rate se <b>${gap.toFixed(0)}% upar</b> hai. Sale ka intezaar kar sakte ho.`
+    : `Ye daam ab tak ke sabse sasta rate ke <b>${gap < 1 ? 'barabar' : 'bahut paas (' + gap.toFixed(0) + '% upar)'}</b> hai. Khareedne ka achha time hai.`;
+  const days = new Set(Object.values(d.history).flat().map(x => x[0])).size;
+  const rows = o.map((x, i) => `<div class="row${i === 0 ? ' best' : ''}">
+    <div class="sname"><span class="dot" style="background:${colorFor(x.store)}"></span>${esc(x.store)}${i === 0 ? ' <span class="pill">Sabse sasta</span>' : ''}</div>
+    <div class="sprice">${inr(x.price)}<span class="sub">${x.title ? 'Mila: ' + esc(x.title) + '<br>' : ''}${x.price > cheapest.price ? '+' + inr(x.price - cheapest.price) + ' zyada' : 'Is store par ab tak kam: ' + inr(x.low)}</span></div>
+    <a class="buy" href="${x.go}" target="_blank" rel="sponsored noopener nofollow">Kharido ↗</a></div>`).join('');
+  $('#result').innerHTML = `<article class="card">
+    <h2 style="margin:0 0 6px">Product</h2><p class="pname">${esc(d.title)}</p>
+    <div class="verdict${wait ? ' wait' : ''}"><div class="vbig">${inr(cheapest.price)}</div><div class="vtxt">${verdict}</div></div>
+    <div class="stat3">
+      <div><small>Ab tak ka sabse kam</small><b>${inr(atl.price)}</b></div>
+      <div><small>Kab, kahan</small><b style="font-size:14px">${fmtD(Date.parse(atl.day))}, ${esc(atl.store)}</b></div>
+      <div><small>Stores ke beech fark</small><b>${inr(priciest.price - cheapest.price)}</b></div></div>
+    <h2>Abhi ka bhav</h2>${rows}
+    <h2>Price history</h2>
+    <div class="legend">${Object.keys(d.history).map(s => `<span><i class="dot" style="background:${colorFor(s)}"></i>${esc(s)}</span>`).join('')}</div>
+    ${chart(d.history)}
+    <p class="note">${d.demo ? 'Demo data: ye prices nakli hain.' : days < 3 ? 'History is product ki pehli baar check hone se shuru hui hai. Har din naya daam judta jayega.' : 'Peela circle sabse kam daam ka din dikhata hai.'}</p>
+  </article>`;
+}
+
+function note(kind, text) { $('#msg').innerHTML = text ? `<div class="msg ${kind}">${text}</div>` : ''; }
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Free server so jaata hai: pehli request fail ho to ek baar 8 second baad dobara koshish karo.
+async function api(path, body) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const r = await fetch(path, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(body)});
+      if ([502, 503, 504].includes(r.status) && attempt === 0) { note('info', '<span class="spin"></span>Server jaag raha hai, thoda ruko...'); await sleep(8000); continue; }
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || 'Kuch gadbad hui.');
+      return d;
+    } catch (e) {
+      if (e instanceof TypeError) {
+        if (attempt === 0) { note('info', '<span class="spin"></span>Server jaag raha hai, thoda ruko...'); await sleep(8000); continue; }
+        throw new Error('Server se connection nahi ho pa raha. Thodi der baad try karo.');
+      }
+      throw e;
+    }
+  }
+}
+
+async function run(input) {
+  const btn = $('#btn'); btn.disabled = true;
+  note('info', '<span class="spin"></span>Daam dhoondh rahe hain. Isme 5 se 15 second lag sakte hain.');
+  try {
+    $('#cands').innerHTML = '';
+    const d = await api('/api/lookup', {input});
+    render(d);
+    history.replaceState(null, '', '#p' + d.id);
+    const diag = d.debug && d.offers.length < 2 ? `Search se ${d.debug.found} results mile, ${d.debug.kept} sahi match hue. Search: "${esc(d.debug.query)}"` : '';
+    note(d.demo || d.warning || diag ? 'info' : '', d.demo ? 'DEMO mode: server par SERPAPI_KEY nahi hai, isliye prices nakli hain.' : [esc(d.warning || ''), diag].filter(Boolean).join('<br>'));
+    loadRecent();
+  } catch (e) { $('#result').innerHTML = ''; note('err', esc(e.message)); }
+  btn.disabled = false;
+}
+
+async function loadRecent() {
+  try {
+    const d = await (await fetch('/api/recent')).json();
+    const box = $('#chips'); box.querySelectorAll('button').forEach(b => b.remove());
+    box.hidden = !d.items.length;
+    d.items.forEach(p => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = p.title; b.title = p.title;
+      b.onclick = async () => { const r = await fetch('/api/product/' + p.id); if (r.ok) { render(await r.json()); history.replaceState(null, '', '#p' + p.id); note('', ''); window.scrollTo({top: $('#result').offsetTop - 12, behavior: 'smooth'}); } };
+      box.appendChild(b); });
+  } catch {}
+}
+
+$('#f').addEventListener('submit', e => { e.preventDefault(); const v = $('#q').value.trim(); if (v) run(v); });
+
+async function shrink(file) {
+  const bmp = await createImageBitmap(file);
+  const k = Math.min(1, 900 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.82);
+}
+$('#photoBtn').addEventListener('click', () => $('#photo').click());
+$('#photo').addEventListener('change', async e => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  $('#result').innerHTML = ''; $('#cands').innerHTML = '';
+  note('info', '<span class="spin"></span>Photo se product dhundh rahe hain. 10 se 25 second lag sakte hain.');
+  try {
+    const d = await api('/api/identify', {image: await shrink(file)});
+    note(d.demo ? 'info' : '', d.demo ? 'DEMO mode: ye nakli options hain.' : '');
+    $('#cands').innerHTML = '<p class="chead">Kya ye aapka product hai? Sahi wale par tap karo</p><div class="cgrid">' + d.candidates.map((c, i) =>
+      `<button type="button" class="cand" data-i="${i}">${c.thumb ? `<img src="${esc(c.thumb)}" alt="" loading="lazy">` : ''}<b>${esc(c.title)}</b><small>${esc(c.source || '')}${c.price ? ' · ' + inr(c.price) : ''}</small></button>`).join('') + '</div>';
+    $('#cands').querySelectorAll('.cand').forEach(b => b.addEventListener('click', () => { const t = d.candidates[b.dataset.i].title; $('#q').value = t; run(t); window.scrollTo({top: 0, behavior: 'smooth'}); }));
+  } catch (err) { note('err', esc(err.message)); }
+});
+loadRecent();
+const m = /^#p(\d+)$/.exec(location.hash);
+if (m) fetch('/api/product/' + m[1]).then(r => r.ok ? r.json() : null).then(d => d && render(d));
+</script>
+</body>
+</html>
